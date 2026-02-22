@@ -33,10 +33,20 @@ env/
 *.swo
 *~
 
-# Logs
-*.log
-logs/
-backend/logs/
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build
+frontend/react-app/build/
+frontend/react-app/dist/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
 # Model files (large)
 *.pt
@@ -44,36 +54,37 @@ backend/logs/
 *.h5
 *.pkl
 *.pickle
-backend/models/*.pt
-backend/thermal_model.pt
 
-# Database
-*.db
-backend/breast_cancer.db
+# Logs
+*.log
+logs/
+backend/logs/
 
 # Reports (generated)
 backend/reports/*.pdf
-backend/reports/*.json
-backend/reports/*.png
 
-# Dataset files
-dataset*/
-data/
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# OS files
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Node modules
-node_modules/
-
-# Build outputs
-build/
-dist/
-
 # Test files
+test_*.pdf
 test_report.pdf
 test_patient.json
 
-# Vite
-.vite/
+# Cache
+.cache/
+.pytest_cache/
+.mypy_cache/

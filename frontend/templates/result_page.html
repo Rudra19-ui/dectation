@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breast Cancer Analysis Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .result-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .result-badge {
+            font-size: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .result-badge.malignant {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .result-badge.benign {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .result-badge.normal {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .result-badge.uncertain {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .image-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        .image-box {
+            width: 48%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            background-color: #f8f9fa;
+        }
+        .image-box img {
+            width: 100%;
+            border-radius: 4px;
+        }
+        .image-box h4 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1rem;
+        }
+        .disclaimer {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            font-size: 0.9rem;
+        }
+        .opacity-control {
+            margin: 1rem 0;
+        }
+        .probability-bars {
+            margin: 1.5rem 0;
+        }
+        .prob-bar {
+            height: 25px;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+        .prob-bar-normal {
+            background-color: #4dabf7;
+        }
+        .prob-bar-benign {
+            background-color: #82c91e;
+        }
+        .prob-bar-malignant {
+            background-color: #e03131;
+        }
+        .recommendation-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container result-container">
+        <h1 class="text-center mb-4">Analysis Results</h1>
+        
+        <!-- Result Badge -->
+        <div id="resultBadge" class="result-badge malignant">
+            Prediction: <span id="predictionText">Malignant</span> (<span id="confidenceValue">82</span>% confidence)
+        </div>
+        
+        <!-- Probability Distribution -->
+        <div class="probability-bars">
+            <h4>Probability Distribution</h4>
+            <div class="d-flex justify-content-between mb-1">
+                <span>Normal: <span id="normalProb">5</span>%</span>
+                <div class="prob-bar prob-bar-normal" style="width: 5%;"></div>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+                <span>Benign: <span id="benignProb">13</span>%</span>
+                <div class="prob-bar prob-bar-benign" style="width: 13%;"></div>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+                <span>Malignant: <span id="malignantProb">82</span>%</span>
+                <div class="prob-bar prob-bar-malignant" style="width: 82%;"></div>
+            </div>
+        </div>
+        
+        <!-- Recommendation Box (conditional) -->
+        <div id="recommendationBox" class="recommendation-box">
+            <h4>Recommendation</h4>
+            <p id="recommendationText">Based on the confidence level, we recommend review by a radiologist.</p>
+        </div>
+        
+        <!-- Images -->
+        <div class="image-container">
+            <div class="image-box">
+                <h4>Original Image</h4>
+                <img id="originalImage" src="/static/placeholder-image.jpg" alt="Original scan image">
+            </div>
+            <div class="image-box">
+                <h4>Analysis Heatmap</h4>
+                <img id="heatmapImage" src="/static/placeholder-heatmap.jpg" alt="Analysis heatmap">
+                <div class="opacity-control mt-2">
+                    <label for="heatmapOpacity" class="form-label">Heatmap Opacity: <span id="opacityValue">70</span>%</label>
+                    <input type="range" class="form-range" id="heatmapOpacity" min="0" max="100" value="70">
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="toggleHeatmap" checked>
+                    <label class="form-check-label" for="toggleHeatmap">Show/Hide Heatmap</label>
+                </div>
+                <p class="mt-2 small text-muted">The heatmap highlights areas the model used to reach the prediction.</p>
+            </div>
+        </div>
+        
+        <!-- Analysis Summary -->
+        <div class="analysis-summary">
+            <h4>Analysis Summary</h4>
+            <p id="analysisSummary">The model detected high asymmetry in the left breast. This is an automated result — consult your doctor.</p>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="downloadReport">
+                <i class="bi bi-file-earmark-pdf"></i> Download PDF Report
+            </button>
+            <button class="btn btn-success" id="sendToRadiologist">
+                <i class="bi bi-envelope"></i> Send to Radiologist
+            </button>
+            <button class="btn btn-secondary" id="retestImage">
+                <i class="bi bi-arrow-repeat"></i> Retest with Different Image
+            </button>
+            <button class="btn btn-outline-danger" id="flagIncorrect">
+                <i class="bi bi-flag"></i> Flag as Incorrect
+            </button>
+        </div>
+        
+        <!-- Safety Information -->
+        <div class="safety-info mt-4">
+            <h4>Important Information</h4>
+            <ul>
+                <li>If this shows "Malignant" or you are worried, contact your doctor immediately.</li>
+                <li>This is an automated analysis and should not replace professional medical advice.</li>
+                <li>If you didn't intend to upload a personal scan, <a href="#" id="deleteData">delete it now</a>.</li>
+            </ul>
+        </div>
+        
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <p><strong>Disclaimer:</strong> This tool is intended to assist medical professionals and is not a replacement for proper medical diagnosis. The results should be reviewed by qualified healthcare providers before making any medical decisions.</p>
+        </div>
+    </div>
+
+    <!-- JavaScript for interactivity -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample data - in production this would come from the backend
+            const resultData = {
+                prediction: "Malignant",
+                confidence: 82,
+                probabilities: {"Normal": 5, "Benign": 13, "Malignant": 82},
+                model_version: "v1.2",
+                explain_id: "exp_abc123",
+                report_id: "rep_abc123",
+                recommendation: "Review by radiologist"
+            };
+            
+            // Update UI with result data
+            function updateUI(data) {
+                // Update prediction text and badge
+                document.getElementById('predictionText').textContent = data.prediction;
+                document.getElementById('confidenceValue').textContent = data.confidence;
+                
+                // Update badge class based on prediction
+                const badge = document.getElementById('resultBadge');
+                badge.className = 'result-badge';
+                badge.classList.add(data.prediction.toLowerCase());
+                
+                // Update probability bars
+                document.getElementById('normalProb').textContent = data.probabilities.Normal;
+                document.getElementById('benignProb').textContent = data.probabilities.Benign;
+                document.getElementById('malignantProb').textContent = data.probabilities.Malignant;
+                
+                // Update probability bar widths
+                document.querySelector('.prob-bar-normal').style.width = `${data.probabilities.Normal}%`;
+                document.querySelector('.prob-bar-benign').style.width = `${data.probabilities.Benign}%`;
+                document.querySelector('.prob-bar-malignant').style.width = `${data.probabilities.Malignant}%`;
+                
+                // Show/hide recommendation box based on confidence
+                const recommendationBox = document.getElementById('recommendationBox');
+                if (data.confidence < 50) {
+                    recommendationBox.style.display = 'block';
+                    document.getElementById('recommendationText').textContent = 
+                        `Based on the low confidence level (${data.confidence}%), we recommend review by a radiologist.`;
+                } else if (data.prediction === 'Malignant') {
+                    recommendationBox.style.display = 'block';
+                    document.getElementById('recommendationText').textContent = 
+                        `This result indicates a potential malignancy. Please consult with your doctor immediately.`;
+                } else {
+                    recommendationBox.style.display = 'none';
+                }
+            }
+            
+            // Initialize with sample data
+            updateUI(resultData);
+            
+            // Heatmap opacity control
+            const opacitySlider = document.getElementById('heatmapOpacity');
+            const opacityValue = document.getElementById('opacityValue');
+            const heatmapImage = document.getElementById('heatmapImage');
+            
+            opacitySlider.addEventListener('input', function() {
+                opacityValue.textContent = this.value;
+                heatmapImage.style.opacity = this.value / 100;
+            });
+            
+            // Toggle heatmap visibility
+            const toggleHeatmap = document.getElementById('toggleHeatmap');
+            toggleHeatmap.addEventListener('change', function() {
+                heatmapImage.style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // Download report button
+            document.getElementById('downloadReport').addEventListener('click', function() {
+                // In production, this would download the PDF report
+                alert(`Downloading report ${resultData.report_id}`);
+                window.location.href = `/reports/${resultData.report_id}.pdf`;
+            });
+            
+            // Send to radiologist button
+            document.getElementById('sendToRadiologist').addEventListener('click', function() {
+                // In production, this would open a form or send directly
+                alert('Opening form to send to radiologist');
+            });
+            
+            // Retest button
+            document.getElementById('retestImage').addEventListener('click', function() {
+                // In production, this would redirect to upload page
+                alert('Redirecting to upload new image');
+                // window.location.href = '/upload';
+            });
+            
+            // Flag as incorrect button
+            document.getElementById('flagIncorrect').addEventListener('click', function() {
+                // In production, this would submit feedback
+                alert('Thank you for your feedback. This result has been flagged for review.');
+            });
+            
+            // Delete data link
+            document.getElementById('deleteData').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to delete all your data? This action cannot be undone.')) {
+                    alert('Your data has been scheduled for deletion.');
+                }
+            });
+        });
+    </script>
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

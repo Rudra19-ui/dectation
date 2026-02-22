@@ -1,0 +1,18 @@
+{
+  "report_id": "BC_User_20260219_121310",
+  "patient": {
+    "firstName": "Test",
+    "lastName": "User",
+    "dateOfBirth": "1990-01-01",
+    "gender": "Female"
+  },
+  "prediction": "Normal",
+  "confidence": 85.5,
+  "probabilities": {
+    "Normal": 85.5,
+    "Benign": 10,
+    "Malignant": 4.5
+  },
+  "analysis_date": "2026-02-19T12:00:00Z",
+  "created_at": "2026-02-19T12:13:10.916186"
+}

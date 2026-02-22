@@ -1,0 +1,17 @@
+torch
+torchvision
+torchsummary
+numpy
+pandas
+scikit-learn
+opencv-python
+pillow
+matplotlib
+seaborn
+scipy
+pydicom
+albumentations
+tqdm
+jupyter
+flask
+flask-cors 

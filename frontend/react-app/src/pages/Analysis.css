@@ -1,0 +1,908 @@
+.analysis-page {
+  padding: 40px 0 80px;
+  min-height: calc(100vh - 80px);
+}
+
+/* Progress Steps */
+.progress-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 48px;
+  padding: 24px;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  background: var(--border-color);
+  color: var(--text-muted);
+  transition: all var(--transition-normal);
+}
+
+.step.active .step-number {
+  background: var(--primary-color);
+  color: white;
+}
+
+.step.completed .step-number {
+  background: var(--success-color);
+  color: white;
+}
+
+.step-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.step.active .step-label {
+  color: var(--primary-color);
+}
+
+.step-line {
+  width: 80px;
+  height: 2px;
+  background: var(--border-color);
+  margin-bottom: 24px;
+}
+
+/* Section Header */
+.analysis-page .section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.analysis-page .section-header h1 {
+  font-size: 2.25rem;
+  margin-bottom: 12px;
+}
+
+.analysis-page .section-header p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+
+/* Patient Info Section */
+.patient-info-section {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.patient-form {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+}
+
+.form-section {
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 24px;
+}
+
+.form-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  color: var(--primary-color);
+  margin-bottom: 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--surface-color);
+  transition: all var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.form-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Upload Section */
+.upload-section {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.upload-content {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+}
+
+.upload-zone-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.upload-zone {
+  position: relative;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 48px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background: white;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-active {
+  border-color: var(--primary-color);
+  background: rgba(0, 102, 204, 0.02);
+}
+
+.upload-zone.drag-active {
+  border-style: solid;
+  box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+}
+
+.file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.upload-icon {
+  width: 64px;
+  height: 64px;
+  color: var(--primary-color);
+  opacity: 0.5;
+}
+
+.upload-zone:hover .upload-icon {
+  opacity: 1;
+}
+
+.upload-placeholder h3 {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.upload-placeholder p {
+  color: var(--text-secondary);
+}
+
+.file-types {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--background-color);
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+}
+
+/* Preview */
+.preview-container {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+}
+
+.image-preview {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.preview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: white;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.preview-container:hover .preview-overlay {
+  opacity: 1;
+}
+
+.patient-info-summary {
+  padding: 16px;
+  background: var(--background-color);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.patient-info-summary h4 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: var(--primary-color);
+}
+
+.upload-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Error Message */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  color: var(--danger-color);
+}
+
+/* Results Section */
+.results-section {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.results-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.patient-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: var(--shadow-md);
+  grid-column: 1 / -1;
+}
+
+.patient-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-item .label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-item .value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Result Cards */
+.result-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  box-shadow: var(--shadow-lg);
+  border-left: 6px solid var(--border-color);
+}
+
+.result-card.result-normal { border-left-color: var(--success-color); }
+.result-card.result-benign { border-left-color: var(--warning-color); }
+.result-card.result-malignant { border-left-color: var(--danger-color); }
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.result-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.result-icon.success { color: var(--success-color); }
+.result-icon.warning { color: var(--warning-color); }
+.result-icon.danger { color: var(--danger-color); }
+
+.result-info h3 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.result-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.result-badge.normal {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.result-badge.benign {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.result-badge.malignant {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Confidence Display */
+.confidence-display {
+  margin-top: 20px;
+}
+
+.confidence-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.confidence-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.confidence-bar {
+  height: 16px;
+  background: var(--background-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  border-radius: 8px;
+  transition: width 0.8s ease-out;
+}
+
+/* Probabilities Card */
+.probabilities-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: var(--shadow-md);
+}
+
+.probabilities-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.probabilities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.probability-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.probability-label {
+  width: 80px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.probability-bar-container {
+  flex: 1;
+  height: 12px;
+  background: var(--background-color);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.probability-bar {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease-out;
+}
+
+.probability-bar.normal { background: var(--success-color); }
+.probability-bar.benign { background: var(--warning-color); }
+.probability-bar.malignant { background: var(--danger-color); }
+
+.probability-value {
+  min-width: 60px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* Info Cards */
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.info-card {
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.info-card.normal { border-top: 4px solid var(--success-color); }
+.info-card.benign { border-top: 4px solid var(--warning-color); }
+.info-card.malignant { border-top: 4px solid var(--danger-color); }
+
+.info-card h5 {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.info-card.normal h5 { color: var(--success-color); }
+.info-card.benign h5 { color: var(--warning-color); }
+.info-card.malignant h5 { color: var(--danger-color); }
+
+.info-card p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Result Actions */
+.result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.result-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.download-btn {
+  width: 100%;
+}
+
+/* Disclaimer */
+.disclaimer {
+  display: flex;
+  gap: 16px;
+  padding: 24px;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius-lg);
+  align-items: flex-start;
+  margin-top: 40px;
+}
+
+.disclaimer svg {
+  color: var(--warning-color);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.disclaimer p {
+  font-size: 0.9rem;
+  color: #92400e;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .progress-steps {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .step-line {
+    display: none;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .result-actions {
+    flex-direction: column;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .upload-actions {
+    flex-direction: column;
+  }
+}
+
+/* Thermal Analysis Specific Styles */
+.thermal-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  border-radius: var(--radius-xl);
+  color: #ffffff;
+  margin-bottom: 32px;
+  margin-top: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.thermal-banner svg {
+  flex-shrink: 0;
+  color: #93c5fd;
+}
+
+.thermal-banner h2 {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.thermal-banner p {
+  font-size: 0.95rem;
+  color: #bfdbfe;
+}
+
+/* Upload info section for thermal */
+.upload-info {
+  margin-top: 24px;
+  padding: 20px;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius-lg);
+}
+
+.upload-info h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: #92400e;
+  margin-bottom: 12px;
+}
+
+.upload-info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.upload-info li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #78350f;
+  line-height: 1.5;
+}
+
+.upload-info li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #d97706;
+  font-weight: bold;
+}
+
+/* Thermal result styles */
+.result-header.result-normal { 
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+}
+
+.result-header.result-malignant { 
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+}
+
+.result-title h2 {
+  font-size: 1.75rem;
+  margin-bottom: 4px;
+}
+
+.result-title .confidence {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* Probability bars for thermal */
+.probability-bars {
+  margin: 24px 0;
+}
+
+.probability-bars h3 {
+  font-size: 1rem;
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.probability-bars .probability-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.probability-bars .label {
+  width: 80px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.probability-bars .bar-container {
+  flex: 1;
+  height: 12px;
+  background: var(--background-color);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.probability-bars .bar {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease-out;
+}
+
+.probability-bars .bar.healthy {
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+}
+
+.probability-bars .bar.sick {
+  background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+}
+
+.probability-bars .value {
+  min-width: 50px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Patient summary in results */
+.patient-summary {
+  background: var(--background-color);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  margin: 20px 0;
+}
+
+.patient-summary h3 {
+  font-size: 1rem;
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.summary-item svg {
+  color: var(--primary-color);
+}
+
+/* Warning and success boxes */
+.warning-box {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-lg);
+  margin-top: 20px;
+}
+
+.warning-box svg {
+  color: var(--danger-color);
+  flex-shrink: 0;
+}
+
+.warning-box strong {
+  display: block;
+  color: var(--danger-color);
+  margin-bottom: 4px;
+}
+
+.warning-box p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.success-box {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-lg);
+  margin-top: 20px;
+}
+
+.success-box svg {
+  color: var(--success-color);
+  flex-shrink: 0;
+}
+
+.success-box strong {
+  display: block;
+  color: var(--success-color);
+  margin-bottom: 4px;
+}
+
+.success-box p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Result details */
+.result-details {
+  padding-top: 16px;
+}
+
+/* Form validation styles */
+.form-group input.error,
+.form-group select.error {
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.field-error {
+  display: block;
+  color: var(--danger-color);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}

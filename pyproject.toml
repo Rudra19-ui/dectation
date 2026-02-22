@@ -1,0 +1,154 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "breast-cancer-classification"
+version = "1.0.0"
+description = "AI-powered breast cancer classification from mammogram images"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Breast Cancer Classification Team", email = "team@example.com"}
+]
+keywords = ["breast-cancer", "medical-ai", "mammography", "deep-learning", "pytorch"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+
+dependencies = [
+    "torch>=1.9.0",
+    "torchvision>=0.10.0",
+    "fastapi>=0.68.0",
+    "uvicorn[standard]>=0.15.0",
+    "streamlit>=1.28.0",
+    "Pillow>=8.3.0",
+    "numpy>=1.21.0",
+    "pandas>=1.3.0",
+    "scikit-learn>=1.0.0",
+    "opencv-python>=4.5.0",
+    "albumentations>=1.0.0",
+    "matplotlib>=3.4.0",
+    "seaborn>=0.11.0",
+    "requests>=2.25.0",
+    "pydicom>=2.3.0",
+    "tqdm>=4.62.0",
+    "scipy>=1.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=22.0.0",
+    "isort>=5.12.0",
+    "flake8>=5.0.0",
+    "pre-commit>=2.20.0",
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "jupyter>=1.0.0",
+    "ipykernel>=6.0.0",
+]
+training = [
+    "tensorboard>=2.8.0",
+    "wandb>=0.12.0",
+    "optuna>=3.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/breast-cancer-classification"
+Documentation = "https://github.com/your-org/breast-cancer-classification#readme"
+Repository = "https://github.com/your-org/breast-cancer-classification.git"
+Issues = "https://github.com/your-org/breast-cancer-classification/issues"
+
+[project.scripts]
+breast-cancer-api = "backend_api:main"
+breast-cancer-train = "train_model:main"
+breast-cancer-predict = "predict_uploaded_image:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "api*", "webapp*", "utils*", "models*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["src", "api", "webapp", "utils", "models"]
+known_third_party = ["torch", "torchvision", "fastapi", "streamlit", "PIL", "numpy", "pandas"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503", "E501"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    ".eggs",
+    "*.egg",
+]
+
+[tool.mypy]
+python_version = 3.9
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breast Cancer Classification - Frontend</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .upload-section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .file-upload {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: transform 0.2s;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .results-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .results-section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .prediction {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .confidence {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .probabilities {
+            display: grid;
+            gap: 10px;
+        }
+
+        .prob-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 30px;
+        }
+
+        .prob-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .benign { background: #28a745; }
+        .malignant { background: #dc3545; }
+        .normal { background: #17a2b8; }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .api-status {
+            background: #e2e3e5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Breast Cancer Classification</h1>
+            <p>AI-Powered Medical Imaging Analysis</p>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <h2>📤 Upload Image</h2>
+                
+                <div class="api-status" id="apiStatus">
+                    Checking API connection...
+                </div>
+
+                <div class="file-upload">
+                    <input type="file" id="imageInput" class="file-input" accept="image/*">
+                    <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
+                        Choose Image
+                    </button>
+                </div>
+
+                <img id="previewImage" class="preview-image" alt="Preview">
+
+                <div id="uploadInfo" style="display: none;">
+                    <p><strong>Selected file:</strong> <span id="fileName"></span></p>
+                    <p><strong>File size:</strong> <span id="fileSize"></span></p>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h2>🔍 Prediction Results</h2>
+                
+                <div id="loadingResults" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Analyzing image...</p>
+                </div>
+
+                <div id="results" style="display: none;">
+                    <div class="result-card">
+                        <div class="prediction" id="predictionClass"></div>
+                        <div class="confidence" id="confidence"></div>
+                        
+                        <div class="probabilities">
+                            <div>
+                                <strong>Benign:</strong>
+                                <div class="prob-bar">
+                                    <div class="prob-fill benign" id="benignProb"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <strong>Malignant:</strong>
+                                <div class="prob-bar">
+                                    <div class="prob-fill malignant" id="malignantProb"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <strong>Normal:</strong>
+                                <div class="prob-bar">
+                                    <div class="prob-fill normal" id="normalProb"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>📊 Image Information</h3>
+                        <p><strong>Size:</strong> <span id="imageSize"></span></p>
+                        <p><strong>Analysis time:</strong> <span id="analysisTime"></span></p>
+                    </div>
+                </div>
+
+                <div id="errorMessage" class="error" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        let selectedFile = null;
+
+        // Check API status on page load
+        window.onload = function() {
+            checkApiStatus();
+        };
+
+        async function checkApiStatus() {
+            const statusDiv = document.getElementById('apiStatus');
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    statusDiv.className = 'api-status status-online';
+                    statusDiv.innerHTML = '✅ API Online - Ready for predictions';
+                } else {
+                    throw new Error('API not responding');
+                }
+            } catch (error) {
+                statusDiv.className = 'api-status status-offline';
+                statusDiv.innerHTML = '❌ API Offline - Please start the backend server';
+            }
+        }
+
+        // Handle file selection
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                displayFileInfo(selectedFile);
+                displayPreview(selectedFile);
+                predictImage(selectedFile);
+            }
+        });
+
+        function displayFileInfo(file) {
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            document.getElementById('uploadInfo').style.display = 'block';
+        }
+
+        function displayPreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('previewImage');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        async function predictImage(file) {
+            const startTime = Date.now();
+            
+            // Show loading
+            document.getElementById('loadingResults').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch(`${API_BASE_URL}/predict`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                displayResults(result, Date.now() - startTime);
+
+            } catch (error) {
+                console.error('Prediction error:', error);
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('errorMessage').innerHTML = 
+                    `❌ Error: ${error.message}. Please ensure the backend server is running.`;
+            } finally {
+                document.getElementById('loadingResults').style.display = 'none';
+            }
+        }
+
+        function displayResults(result, analysisTime) {
+            // Update prediction class
+            const predictionClass = document.getElementById('predictionClass');
+            predictionClass.textContent = result.class.toUpperCase();
+            predictionClass.className = 'prediction';
+            
+            // Add color coding
+            if (result.class === 'malignant') {
+                predictionClass.style.color = '#dc3545';
+            } else if (result.class === 'benign') {
+                predictionClass.style.color = '#28a745';
+            } else {
+                predictionClass.style.color = '#17a2b8';
+            }
+
+            // Update confidence
+            document.getElementById('confidence').textContent = 
+                `Confidence: ${(result.confidence * 100).toFixed(1)}%`;
+
+            // Update probabilities
+            document.getElementById('benignProb').textContent = 
+                `${(result.probabilities.benign * 100).toFixed(1)}%`;
+            document.getElementById('benignProb').style.width = 
+                `${result.probabilities.benign * 100}%`;
+
+            document.getElementById('malignantProb').textContent = 
+                `${(result.probabilities.malignant * 100).toFixed(1)}%`;
+            document.getElementById('malignantProb').style.width = 
+                `${result.probabilities.malignant * 100}%`;
+
+            document.getElementById('normalProb').textContent = 
+                `${(result.probabilities.normal * 100).toFixed(1)}%`;
+            document.getElementById('normalProb').style.width = 
+                `${result.probabilities.normal * 100}%`;
+
+            // Update image info
+            document.getElementById('imageSize').textContent = 
+                `${result.image_size[0]} x ${result.image_size[1]} pixels`;
+            document.getElementById('analysisTime').textContent = 
+                `${analysisTime}ms`;
+
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html> 

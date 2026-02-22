@@ -1,0 +1,12 @@
+MODEL SUMMARY - PYTORCH
+==================================================
+
+Model Type: resnet50
+Framework: pytorch
+Input Size: 224x224x3
+Output Classes: 3
+Freeze Backbone: True
+Learning Rate: 0.0001
+Device: cpu
+Total Parameters: 24558659
+Trainable Parameters: 1050627

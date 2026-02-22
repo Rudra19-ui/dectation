@@ -1,0 +1,99 @@
+# Breast Cancer Classification - Environment Variables
+# Copy this file to .env and update the values as needed
+
+# =============================================================================
+# API Configuration
+# =============================================================================
+API_HOST=0.0.0.0
+API_PORT=8000
+API_WORKERS=1
+API_RELOAD=false
+API_LOG_LEVEL=info
+
+# =============================================================================
+# Streamlit Configuration
+# =============================================================================
+STREAMLIT_PORT=8502
+STREAMLIT_HOST=localhost
+STREAMLIT_HEADLESS=true
+STREAMLIT_SERVER_ADDRESS=0.0.0.0
+
+# =============================================================================
+# Model Configuration
+# =============================================================================
+MODEL_PATH=best_improved_model.pt
+MODEL_DEVICE=auto
+MODEL_CONFIDENCE_THRESHOLD=0.5
+MODEL_BATCH_SIZE=1
+
+# =============================================================================
+# Data Configuration
+# =============================================================================
+DATA_ROOT=./data
+PREPROCESSED_DATA_ROOT=./preprocessed_dataset
+MODEL_SAVE_DIR=./models
+REPORTS_DIR=./reports
+LOG_DIR=./logs
+
+# =============================================================================
+# Image Processing
+# =============================================================================
+IMAGE_SIZE=224
+IMAGE_CHANNELS=3
+IMAGE_NORMALIZE_MEAN=0.485,0.456,0.406
+IMAGE_NORMALIZE_STD=0.229,0.224,0.225
+
+# =============================================================================
+# Training Configuration
+# =============================================================================
+TRAIN_BATCH_SIZE=32
+TRAIN_EPOCHS=100
+TRAIN_LEARNING_RATE=0.001
+TRAIN_WEIGHT_DECAY=1e-4
+TRAIN_PATIENCE=10
+TRAIN_VALIDATION_SPLIT=0.2
+TRAIN_TEST_SPLIT=0.1
+
+# =============================================================================
+# Logging Configuration
+# =============================================================================
+LOG_LEVEL=INFO
+LOG_FORMAT=%(asctime)s - %(name)s - %(levelname)s - %(message)s
+LOG_FILE=breast_cancer_classification.log
+
+# =============================================================================
+# Security Configuration
+# =============================================================================
+SECRET_KEY=your-secret-key-here-change-in-production
+CORS_ORIGINS=*
+ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+
+# =============================================================================
+# Development Configuration
+# =============================================================================
+DEBUG=false
+ENVIRONMENT=development
+PYTHONPATH=.
+
+# =============================================================================
+# External Services (Optional)
+# =============================================================================
+# WANDB_PROJECT=breast-cancer-classification
+# WANDB_ENTITY=your-entity
+# TENSORBOARD_LOG_DIR=./logs/tensorboard
+
+# =============================================================================
+# Database Configuration (if using database)
+# =============================================================================
+# DATABASE_URL=sqlite:///./breast_cancer.db
+# DATABASE_ECHO=false
+
+# =============================================================================
+# Email Configuration (if using email notifications)
+# =============================================================================
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USERNAME=your-email@gmail.com
+# SMTP_PASSWORD=your-app-password
+# EMAIL_FROM=your-email@gmail.com
+
