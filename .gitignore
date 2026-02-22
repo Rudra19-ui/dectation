@@ -1,0 +1,79 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+backend/logs/
+
+# Model files (large)
+*.pt
+*.pth
+*.h5
+*.pkl
+*.pickle
+backend/models/*.pt
+backend/thermal_model.pt
+
+# Database
+*.db
+backend/breast_cancer.db
+
+# Reports (generated)
+backend/reports/*.pdf
+backend/reports/*.json
+backend/reports/*.png
+
+# Dataset files
+dataset*/
+data/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node modules
+node_modules/
+
+# Build outputs
+build/
+dist/
+
+# Test files
+test_report.pdf
+test_patient.json
+
+# Vite
+.vite/
