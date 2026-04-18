@@ -92,3 +92,8 @@ test_patient.json
 # Vite pre-bundle cache (regenerated on npm run dev)
 frontend/react-app/.vite/
 
+# Large local datasets (not tracked; too large for GitHub)
+dataset4/
+backend/datasets/
+backend/data/
+
