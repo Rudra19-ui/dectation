@@ -9,12 +9,13 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import torch
 import torch.nn as nn
 import uvicorn
-from fastapi import FastAPI, File, HTTPException, UploadFile, BackgroundTasks
+from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from PIL import Image
@@ -106,7 +107,12 @@ async def health_check():
 
 
 @app.post("/predict")
-async def predict_image(file: UploadFile = File(...), background_tasks: BackgroundTasks = None, consent: bool = True, request_id: str = None):
+async def predict_image(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    consent: bool = Form(True),
+    request_id: Optional[str] = Form(None),
+):
     """Predict breast cancer from uploaded image"""
     try:
         # Verify consent
@@ -242,7 +248,11 @@ async def get_thermal_model_info():
 
 
 @app.post("/predict-thermal")
-async def predict_thermal_image(file: UploadFile = File(...), consent: bool = True, request_id: str = None):
+async def predict_thermal_image(
+    file: UploadFile = File(...),
+    consent: bool = Form(True),
+    request_id: Optional[str] = Form(None),
+):
     """Predict breast cancer from thermal image"""
     try:
         # Verify consent
@@ -268,8 +278,22 @@ async def predict_thermal_image(file: UploadFile = File(...), consent: bool = Tr
         except Exception as e:
             raise validation_error_to_http_exception(e)
 
-        # Use validated image
-        image = validation_result["image"]
+        # Extract PIL image (same as /predict — supports DICOM and raster)
+        if validation_result["is_dicom"]:
+            ds = validation_result["dicom_dataset"]
+            pixel_array = ds.pixel_array
+            if pixel_array.dtype != np.uint8:
+                pixel_array = (
+                    (pixel_array - pixel_array.min())
+                    / (pixel_array.max() - pixel_array.min())
+                    * 255
+                ).astype(np.uint8)
+            if len(pixel_array.shape) == 3:
+                image = Image.fromarray(pixel_array)
+            else:
+                image = Image.fromarray(pixel_array, mode="L").convert("RGB")
+        else:
+            image = validation_result["image"]
         
         # Convert image to bytes for prediction
         img_buffer = io.BytesIO()
@@ -304,7 +328,11 @@ async def predict_thermal_image(file: UploadFile = File(...), consent: bool = Tr
 
 
 @app.post("/predict-async")
-async def predict_image_async(file: UploadFile = File(...), consent: bool = True, request_id: str = None):
+async def predict_image_async(
+    file: UploadFile = File(...),
+    consent: bool = Form(True),
+    request_id: Optional[str] = Form(None),
+):
     """Endpoint for asynchronous image prediction.
     
     This endpoint is optimized for larger files or batch processing. It immediately returns a job ID

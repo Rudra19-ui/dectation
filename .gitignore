@@ -88,3 +88,7 @@ test_patient.json
 .cache/
 .pytest_cache/
 .mypy_cache/
+
+# Vite pre-bundle cache (regenerated on npm run dev)
+frontend/react-app/.vite/
+

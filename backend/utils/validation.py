@@ -26,6 +26,7 @@ SUPPORTED_IMAGE_TYPES = {
     "image/jpg",
     "image/bmp",
     "image/tiff",
+    "image/webp",
 }
 SUPPORTED_DICOM_TYPES = {"application/dicom", "application/dcm"}
 
@@ -95,6 +96,56 @@ def validate_bytes(data: bytes) -> bool:
         raise ValidationError(f"Unsupported file type: {mime_type}")
     
     return True
+
+def _pil_format_to_mime(image: Image.Image) -> str:
+    """Map PIL format to MIME type for images we accept."""
+    fmt = (image.format or "PNG").upper()
+    mapping = {
+        "JPEG": "image/jpeg",
+        "JPG": "image/jpeg",
+        "PNG": "image/png",
+        "BMP": "image/bmp",
+        "TIFF": "image/tiff",
+        "WEBP": "image/webp",
+    }
+    return mapping.get(fmt, "image/png")
+
+
+def _validate_image_pil_fallback(data: bytes) -> Tuple[Image.Image, str]:
+    """
+    Load and validate image using PIL when magic-byte detection (filetype) fails
+    or returns an unsupported label. Many valid JPEG/PNG files are mis-detected.
+    """
+    try:
+        image: Image.Image = Image.open(io.BytesIO(data))
+        image.load()
+    except Exception as e:
+        raise ValidationError(f"Invalid image format: {str(e)}") from e
+
+    if image.mode != "RGB":
+        image = image.convert("RGB")
+
+    width, height = image.size
+    if width < MIN_IMAGE_DIMENSION or height < MIN_IMAGE_DIMENSION:
+        raise ValidationError(
+            f"Image too small. Minimum dimensions: {MIN_IMAGE_DIMENSION}x{MIN_IMAGE_DIMENSION}"
+        )
+    if width > MAX_IMAGE_DIMENSION or height > MAX_IMAGE_DIMENSION:
+        raise ValidationError(
+            f"Image too large. Maximum dimensions: {MAX_IMAGE_DIMENSION}x{MAX_IMAGE_DIMENSION}"
+        )
+
+    try:
+        np.array(image)
+    except Exception as e:
+        raise ValidationError(f"Corrupted image data: {str(e)}") from e
+
+    mime_type = _pil_format_to_mime(image)
+    if mime_type not in SUPPORTED_IMAGE_TYPES:
+        raise ValidationError(f"Unsupported image type: {mime_type}")
+
+    return image, mime_type
+
 
 def validate_image_data(data: bytes) -> Tuple[Image.Image, str]:
     """
@@ -263,27 +314,25 @@ def validate_upload_bytes(data: bytes) -> Dict[str, Any]:
     # Basic size validation
     validate_file_size(data)
 
-    # Detect file type
+    # Detect file type (magic bytes); can fail on some valid camera / editor JPEGs
     kind = filetype.guess(data)
-    if kind is None:
-        raise ValidationError("Unable to detect file type")
-
-    mime_type = kind.mime
-    file_extension = kind.extension
+    mime_type = kind.mime if kind else None
+    file_extension = kind.extension if kind else None
 
     result = {
-        "mime_type": mime_type,
-        "file_extension": file_extension,
+        "mime_type": mime_type or "application/octet-stream",
+        "file_extension": file_extension or "",
         "file_size": len(data),
-        "is_dicom": mime_type in SUPPORTED_DICOM_TYPES,
-        "is_image": mime_type in SUPPORTED_IMAGE_TYPES,
+        "is_dicom": mime_type in SUPPORTED_DICOM_TYPES if mime_type else False,
+        "is_image": mime_type in SUPPORTED_IMAGE_TYPES if mime_type else False,
         "validation_passed": True,
     }
 
     try:
-        if mime_type in SUPPORTED_DICOM_TYPES:
+        if mime_type and mime_type in SUPPORTED_DICOM_TYPES:
             # Validate DICOM
-            ds, _ = validate_dicom_data(data)
+            ds, detected_mime = validate_dicom_data(data)
+            result["mime_type"] = detected_mime
             result.update(
                 {
                     "dicom_dataset": ds,
@@ -297,15 +346,57 @@ def validate_upload_bytes(data: bytes) -> Dict[str, Any]:
                 }
             )
 
-        elif mime_type in SUPPORTED_IMAGE_TYPES:
+        elif mime_type and mime_type in SUPPORTED_IMAGE_TYPES:
             # Validate image
-            image, _ = validate_image_data(data)
+            image, detected_mime = validate_image_data(data)
+            result["mime_type"] = detected_mime
             result.update(
                 {"image": image, "image_size": image.size, "image_mode": image.mode}
             )
 
         else:
-            raise ValidationError(f"Unsupported file type: {mime_type}")
+            # Unknown or unsupported magic bytes: try PIL (common fix for JPEG/PNG),
+            # then DICOM if still not an image.
+            try:
+                image, detected_mime = _validate_image_pil_fallback(data)
+                result["mime_type"] = detected_mime
+                result["is_dicom"] = False
+                result["is_image"] = True
+                result.update(
+                    {
+                        "image": image,
+                        "image_size": image.size,
+                        "image_mode": image.mode,
+                    }
+                )
+            except ValidationError:
+                try:
+                    ds, detected_mime = validate_dicom_data(data)
+                    result["mime_type"] = detected_mime
+                    result["is_dicom"] = True
+                    result["is_image"] = False
+                    result.update(
+                        {
+                            "dicom_dataset": ds,
+                            "has_phi": any(
+                                hasattr(ds, tag)
+                                for tag in ["PatientName", "PatientID", "PatientBirthDate"]
+                            ),
+                            "study_uid": getattr(ds, "StudyInstanceUID", None),
+                            "series_uid": getattr(ds, "SeriesInstanceUID", None),
+                            "instance_uid": getattr(ds, "SOPInstanceUID", None),
+                        }
+                    )
+                except ValidationError:
+                    hint = (
+                        mime_type
+                        if mime_type
+                        else "unknown (could not read file headers)"
+                    )
+                    raise ValidationError(
+                        f"Unsupported or unreadable file ({hint}). "
+                        "Use PNG, JPEG, WebP, TIFF, BMP, or DICOM."
+                    )
 
     except ValidationError as e:
         logger.error(f"Validation failed: {str(e)}")

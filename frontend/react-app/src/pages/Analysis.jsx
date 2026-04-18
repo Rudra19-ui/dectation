@@ -191,7 +191,19 @@ const Analysis = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Analysis failed. Please try again.');
+        let detail = `Analysis failed (${response.status}). Please try again.`;
+        try {
+          const errBody = await response.json();
+          if (errBody.detail != null) {
+            detail =
+              typeof errBody.detail === 'string'
+                ? errBody.detail
+                : JSON.stringify(errBody.detail);
+          }
+        } catch {
+          /* ignore non-JSON error bodies */
+        }
+        throw new Error(detail);
       }
       
       // Parse JSON response from backend
@@ -220,7 +232,11 @@ const Analysis = () => {
       setStep(3);
     } catch (err) {
       console.error('Analysis error:', err);
-      setError('Analysis failed. Please try again.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Analysis failed. Please try again.'
+      );
     } finally {
       setIsAnalyzing(false);
     }
